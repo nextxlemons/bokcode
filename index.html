@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Poppins:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   :root{
     --pink:#ff2e93;
@@ -326,7 +327,7 @@
           <textarea id="idea" placeholder="I once told my boss I had a 'family emergency' to watch a cricket match..." required maxlength="500"></textarea>
         </div>
         <button type="submit" id="submitBtn">Post It 🚀</button>
-        <p class="hint">Posts are saved in your browser only (no backend yet) — see note in the code comments for how to make it shared.</p>
+        <p class="hint">Public wall — everyone who visits sees everyone's posts.</p>
       </form>
     </section>
   </main>
@@ -336,29 +337,15 @@
   <div class="toast" id="toast">Posted! Sab ko pata chal gaya 👀</div>
 
 <script>
-  // ---------- seed posts (shown the very first time, then real posts take over) ----------
-  const seedPosts = [
-    { username: "@sasta_sherlock", name: "Priya", idea: "I've been pretending to understand crypto in every family WhatsApp group for 3 years now." },
-    { username: "@chai_pe_charcha", name: "Rohit", idea: "Idea: an app that just sends you a fake 'urgent call' so you can leave boring parties on time." },
-    { username: "@ghost_of_2011", name: "Anonymous", idea: "Confession: I still know every word to that one cringe song from school annual day. No regrets." },
-    { username: "@bhai_ka_dost", name: "Karan", idea: "Weird thought: what if auto-rickshaw drivers have a secret union that decides who gets which route today." }
-  ];
+  // =====================================================================
+  // SUPABASE SETUP — fill these in with your own free project's values
+  // (Project Settings → API → Project URL / anon public key)
+  // =====================================================================
+  const SUPABASE_URL = "https://sb_publishable_KKSnuY0Eeui0OCyR-FW1rw_Dv8Rh9DY.com/dashboard/project/tcndrqpzbbliqaggcugp";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRjbmRycXB6YmJsaXFhZ2djdWdwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAwMDEyMzcsImV4cCI6MjEwNTU3NzIzN30.AjFZS6moAcFtZuFffiEi-ZXPb89G8v4e8NYltvzcUDg";
 
-  const STORAGE_KEY = "backchodi_posts_v1";
-
-  function loadPosts() {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) {
-      try { return JSON.parse(raw); } catch (e) { /* fall through */ }
-    }
-    // first visit: seed it
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(seedPosts));
-    return seedPosts;
-  }
-
-  function savePosts(posts) {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(posts));
-  }
+  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  const TABLE = "posts";
 
   function escapeHTML(str) {
     const div = document.createElement("div");
@@ -366,11 +353,21 @@
     return div.innerHTML;
   }
 
-  function renderFeed() {
-    const posts = loadPosts();
+  function showToast(msg) {
+    const toast = document.getElementById("toast");
+    toast.textContent = msg;
+    toast.classList.add("show");
+    setTimeout(() => toast.classList.remove("show"), 2200);
+  }
+
+  function renderPosts(posts) {
     const feed = document.getElementById("feed");
+    if (!posts || posts.length === 0) {
+      feed.innerHTML = `<p class="hint" style="text-align:center;">No posts yet. Be the first backchod 👀</p>`;
+      return;
+    }
     feed.innerHTML = "";
-    posts.slice().reverse().forEach((post, i) => {
+    posts.forEach((post, i) => {
       const el = document.createElement("div");
       el.className = "post";
       el.innerHTML = `
@@ -385,45 +382,87 @@
     });
   }
 
-  function showToast(msg) {
-    const toast = document.getElementById("toast");
-    toast.textContent = msg;
-    toast.classList.add("show");
-    setTimeout(() => toast.classList.remove("show"), 2200);
+  async function loadPosts() {
+    const feed = document.getElementById("feed");
+    feed.innerHTML = `<p class="hint" style="text-align:center;">Loading the chaos...</p>`;
+    const { data, error } = await supabase
+      .from(TABLE)
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(100);
+
+    if (error) {
+      feed.innerHTML = `<p class="hint" style="text-align:center;">Couldn't load posts. Check your Supabase URL/key are set correctly.</p>`;
+      console.error(error);
+      return;
+    }
+    renderPosts(data);
   }
 
-  document.getElementById("postForm").addEventListener("submit", function (e) {
+  document.getElementById("postForm").addEventListener("submit", async function (e) {
     e.preventDefault();
     const username = document.getElementById("username").value.trim();
     const name = document.getElementById("name").value.trim();
     const idea = document.getElementById("idea").value.trim();
     if (!username || !name || !idea) return;
 
-    const posts = loadPosts();
-    posts.push({ username, name, idea });
-    savePosts(posts);
-    renderFeed();
+    const btn = document.getElementById("submitBtn");
+    btn.disabled = true;
+    btn.textContent = "Posting...";
+
+    const { error } = await supabase.from(TABLE).insert([{ username, name, idea }]);
+
+    btn.disabled = false;
+    btn.textContent = "Post It 🚀";
+
+    if (error) {
+      console.error(error);
+      showToast("Oops, couldn't post. Try again.");
+      return;
+    }
 
     this.reset();
     showToast("Posted! Sab ko pata chal gaya 👀");
     document.getElementById("feed").scrollTop = 0;
+    loadPosts();
   });
 
-  renderFeed();
+  // live updates: when anyone else posts, the feed refreshes for everyone watching
+  supabase
+    .channel("public:posts")
+    .on("postgres_changes", { event: "INSERT", schema: "public", table: TABLE }, () => {
+      loadPosts();
+    })
+    .subscribe();
+
+  loadPosts();
 </script>
 
 <!--
-  NOTE ON SHARED POSTS ACROSS VISITORS:
-  This site currently stores posts in localStorage, which is private to each
-  visitor's own browser — great for a demo / personal use, zero cost, works
-  instantly on Vercel's free static hosting.
+  SETUP — Supabase (free, no credit card required)
+  1. Go to supabase.com → sign up → "New project" (pick the free tier).
+  2. Open the SQL editor and run:
 
-  If you want every visitor to see everyone else's posts (a real shared wall),
-  you need a tiny free database + a Vercel Serverless Function, e.g.:
-    - Vercel + Upstash Redis (free tier, integrates directly in Vercel dashboard)
-    - Or Supabase free tier (Postgres) with a simple REST call
-  Ask Claude to wire this up if you want the upgrade — still 100% free tier,
-  still no heavy frontend framework needed.
+     create table posts (
+       id bigint generated always as identity primary key,
+       username text not null,
+       name text not null,
+       idea text not null,
+       created_at timestamptz default now()
+     );
+
+     alter table posts enable row level security;
+
+     create policy "public can read" on posts
+       for select using (true);
+
+     create policy "public can insert" on posts
+       for insert with check (true);
+
+  3. Go to Project Settings → API. Copy the "Project URL" and the
+     "anon public" key into SUPABASE_URL / SUPABASE_ANON_KEY above.
+  4. Deploy to Vercel as normal — the feed is now shared and public
+     for every visitor, live-updating when someone new posts.
 -->
 </body>
 </html>
