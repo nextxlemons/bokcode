@@ -1,468 +1,175 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Backchodi Wall — Bol De Bhai</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Poppins:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<style>
-  :root{
-    --pink:#ff2e93;
-    --purple:#7b2ff7;
-    --yellow:#ffd23f;
-    --mint:#00f5d4;
-    --ink:#1a0b2e;
-    --cream:#fff9f0;
-  }
-  *{box-sizing:border-box;}
-  html,body{margin:0;padding:0;height:100%;}
-  body{
-    font-family:'Poppins',sans-serif;
-    color:var(--cream);
-    min-height:100vh;
-    overflow-x:hidden;
-    position:relative;
-    background:
-      radial-gradient(circle at 15% 20%, rgba(255,46,147,.55), transparent 40%),
-      radial-gradient(circle at 85% 15%, rgba(123,47,247,.6), transparent 45%),
-      radial-gradient(circle at 50% 90%, rgba(0,245,212,.35), transparent 50%),
-      radial-gradient(circle at 90% 80%, rgba(255,210,63,.35), transparent 40%),
-      linear-gradient(160deg, #1a0b2e 0%, #2b0f4a 45%, #170821 100%);
-    background-attachment:fixed;
-  }
-  /* spotlight beams for concert vibe */
-  body::before{
-    content:"";
-    position:fixed;
-    inset:0;
-    background:
-      repeating-conic-gradient(from 250deg at 20% -10%, rgba(255,255,255,.05) 0deg 4deg, transparent 4deg 14deg),
-      repeating-conic-gradient(from 290deg at 80% -10%, rgba(255,255,255,.04) 0deg 4deg, transparent 4deg 14deg);
-    pointer-events:none;
-    z-index:0;
-  }
-  /* grain/glitter texture */
-  body::after{
-    content:"";
-    position:fixed;
-    inset:0;
-    background-image:
-      radial-gradient(circle, rgba(255,255,255,.5) 1px, transparent 1px);
-    background-size:3px 3px;
-    opacity:.05;
-    pointer-events:none;
-    z-index:0;
-  }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  .glow-blob{
-    position:fixed;
-    border-radius:50%;
-    filter:blur(70px);
-    opacity:.5;
-    z-index:0;
-    animation:drift 14s ease-in-out infinite alternate;
-  }
-  .blob1{width:280px;height:280px;background:var(--pink);top:8%;left:-60px;}
-  .blob2{width:340px;height:340px;background:var(--purple);bottom:5%;right:-80px;animation-delay:2s;}
-  .blob3{width:200px;height:200px;background:var(--mint);top:45%;right:20%;animation-delay:4s;}
-  @keyframes drift{
-    from{transform:translateY(0) translateX(0);}
-    to{transform:translateY(-25px) translateX(20px);}
-  }
+    <title>ThoughtSpace</title>
 
-  header{
-    position:relative;
-    z-index:2;
-    text-align:center;
-    padding:46px 20px 28px;
-  }
-  .mic-emoji{font-size:2.1rem;display:inline-block;transform:rotate(-8deg);margin-bottom:6px;}
-  h1{
-    font-family:'Fredoka',sans-serif;
-    font-weight:700;
-    font-size:clamp(2.3rem, 6vw, 4rem);
-    margin:0;
-    letter-spacing:.5px;
-    background:linear-gradient(90deg, var(--yellow), var(--pink) 45%, var(--mint));
-    -webkit-background-clip:text;
-    background-clip:text;
-    color:transparent;
-    text-shadow:0 0 40px rgba(255,46,147,.25);
-  }
-  header p{
-    margin:10px auto 0;
-    max-width:480px;
-    font-size:1rem;
-    color:#e8d9ff;
-    line-height:1.55;
-  }
-  header p span{color:var(--yellow);font-weight:600;}
+    <link rel="stylesheet" href="style.css">
 
-  main{
-    position:relative;
-    z-index:2;
-    max-width:1180px;
-    margin:0 auto;
-    padding:10px 24px 70px;
-    display:grid;
-    grid-template-columns:1.15fr 0.85fr;
-    gap:28px;
-    align-items:start;
-  }
-  @media (max-width:840px){
-    main{grid-template-columns:1fr;}
-  }
-
-  .panel{
-    background:rgba(255,255,255,.07);
-    border:1px solid rgba(255,255,255,.16);
-    border-radius:22px;
-    backdrop-filter:blur(18px);
-    -webkit-backdrop-filter:blur(18px);
-    box-shadow:0 20px 50px rgba(0,0,0,.35);
-    padding:24px;
-  }
-
-  .panel-title{
-    font-family:'Fredoka',sans-serif;
-    font-size:1.3rem;
-    font-weight:600;
-    margin:0 0 4px;
-    display:flex;
-    align-items:center;
-    gap:8px;
-  }
-  .panel-sub{
-    margin:0 0 18px;
-    font-size:.85rem;
-    color:#cbb8ec;
-  }
-
-  /* FEED */
-  #feed{
-    display:flex;
-    flex-direction:column;
-    gap:14px;
-    max-height:620px;
-    overflow-y:auto;
-    padding-right:6px;
-  }
-  #feed::-webkit-scrollbar{width:6px;}
-  #feed::-webkit-scrollbar-thumb{background:rgba(255,255,255,.25);border-radius:10px;}
-
-  .post{
-    background:linear-gradient(135deg, rgba(255,255,255,.09), rgba(255,255,255,.03));
-    border:1px solid rgba(255,255,255,.14);
-    border-radius:16px;
-    padding:16px 18px;
-    position:relative;
-    animation:pop-in .35s ease;
-  }
-  @keyframes pop-in{
-    from{opacity:0; transform:translateY(10px) scale(.97);}
-    to{opacity:1; transform:translateY(0) scale(1);}
-  }
-  .post-top{
-    display:flex;
-    justify-content:space-between;
-    align-items:baseline;
-    gap:10px;
-    margin-bottom:6px;
-  }
-  .post-name{
-    font-weight:600;
-    font-size:.95rem;
-    color:var(--yellow);
-  }
-  .post-user{
-    font-size:.78rem;
-    color:#b9a4dd;
-  }
-  .post-idea{
-    font-size:.95rem;
-    line-height:1.5;
-    color:#fdf6ff;
-    margin:0;
-    word-wrap:break-word;
-  }
-  .post-tag{
-    position:absolute;
-    top:-9px;
-    right:14px;
-    font-size:.65rem;
-    background:var(--pink);
-    color:#1a0b2e;
-    padding:2px 9px;
-    border-radius:20px;
-    font-weight:600;
-    box-shadow:0 3px 10px rgba(255,46,147,.4);
-  }
-
-  /* FORM */
-  .field{margin-bottom:16px;}
-  .field label{
-    display:block;
-    font-size:.8rem;
-    color:var(--mint);
-    margin-bottom:6px;
-    font-weight:500;
-  }
-  .field input,
-  .field textarea{
-    width:100%;
-    background:rgba(0,0,0,.25);
-    border:1.5px solid rgba(255,255,255,.18);
-    border-radius:12px;
-    padding:11px 13px;
-    font-family:'Poppins',sans-serif;
-    font-size:.92rem;
-    color:var(--cream);
-    outline:none;
-    transition:border-color .2s, box-shadow .2s;
-    resize:vertical;
-  }
-  .field textarea{min-height:110px;}
-  .field input::placeholder,
-  .field textarea::placeholder{color:#9884bd;}
-  .field input:focus,
-  .field textarea:focus{
-    border-color:var(--pink);
-    box-shadow:0 0 0 3px rgba(255,46,147,.22);
-  }
-
-  #submitBtn{
-    width:100%;
-    border:none;
-    border-radius:14px;
-    padding:14px;
-    font-family:'Fredoka',sans-serif;
-    font-size:1.05rem;
-    font-weight:600;
-    letter-spacing:.3px;
-    color:#1a0b2e;
-    background:linear-gradient(90deg, var(--yellow), var(--pink));
-    cursor:pointer;
-    transition:transform .15s ease, box-shadow .15s ease;
-    box-shadow:0 10px 25px rgba(255,46,147,.35);
-  }
-  #submitBtn:hover{transform:translateY(-2px);}
-  #submitBtn:active{transform:translateY(0) scale(.98);}
-
-  .hint{
-    font-size:.72rem;
-    color:#9884bd;
-    margin-top:12px;
-    text-align:center;
-    line-height:1.5;
-  }
-
-  .toast{
-    position:fixed;
-    bottom:24px;
-    left:50%;
-    transform:translateX(-50%) translateY(20px);
-    background:var(--mint);
-    color:#0e1a17;
-    padding:12px 22px;
-    border-radius:30px;
-    font-weight:600;
-    font-size:.9rem;
-    box-shadow:0 10px 30px rgba(0,0,0,.4);
-    opacity:0;
-    pointer-events:none;
-    transition:all .35s ease;
-    z-index:10;
-  }
-  .toast.show{
-    opacity:1;
-    transform:translateX(-50%) translateY(0);
-  }
-
-  footer{
-    position:relative;
-    z-index:2;
-    text-align:center;
-    padding:20px;
-    font-size:.75rem;
-    color:#9884bd;
-  }
-</style>
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="app.js"></script>
 </head>
+
 <body>
 
-  <div class="glow-blob blob1"></div>
-  <div class="glow-blob blob2"></div>
-  <div class="glow-blob blob3"></div>
+    <header class="navbar">
+        <div class="logo">ThoughtSpace</div>
 
-  <header>
-    <div class="mic-emoji">🎤</div>
-    <h1>Backchodi Wall</h1>
-    <p>Ideas, confessions, 3am thoughts, that one weird story — <span>bol de bhai</span>, nobody's judging (okay, maybe a little).</p>
-  </header>
+        <button id="writeBtn" class="nav-button">
+            Share something
+        </button>
+    </header>
 
-  <main>
-    <section class="panel" aria-label="Recent posts">
-      <h2 class="panel-title">📢 Fresh Gossip</h2>
-      <p class="panel-sub">What everyone's confessing right now</p>
-      <div id="feed"></div>
-    </section>
 
-    <section class="panel" aria-label="Submit a post">
-      <h2 class="panel-title">✍️ Your Turn</h2>
-      <p class="panel-sub">Spill it. Anonymous-ish.</p>
-      <form id="postForm">
-        <div class="field">
-          <label for="username">Username</label>
-          <input type="text" id="username" placeholder="e.g. chai_pe_charcha" required maxlength="30">
-        </div>
-        <div class="field">
-          <label for="name">Name</label>
-          <input type="text" id="name" placeholder="e.g. Rohit" required maxlength="30">
-        </div>
-        <div class="field">
-          <label for="idea">Your idea / confession / story</label>
-          <textarea id="idea" placeholder="I once told my boss I had a 'family emergency' to watch a cricket match..." required maxlength="500"></textarea>
-        </div>
-        <button type="submit" id="submitBtn">Post It 🚀</button>
-        <p class="hint">Public wall — everyone who visits sees everyone's posts.</p>
-      </form>
-    </section>
-  </main>
+    <main>
 
-  <footer>made with chai ☕ and questionable decisions — Backchodi Wall © 2026</footer>
+        <!-- HERO -->
 
-  <div class="toast" id="toast">Posted! Sab ko pata chal gaya 👀</div>
+        <section class="hero">
 
-<script>
-  // =====================================================================
-  // SUPABASE SETUP — fill these in with your own free project's values
-  // (Project Settings → API → Project URL / anon public key)
-  // =====================================================================
-  const SUPABASE_URL = "https://sb_publishable_KKSnuY0Eeui0OCyR-FW1rw_Dv8Rh9DY.com/dashboard/project/tcndrqpzbbliqaggcugp";
-  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRjbmRycXB6YmJsaXFhZ2djdWdwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAwMDEyMzcsImV4cCI6MjEwNTU3NzIzN30.AjFZS6moAcFtZuFffiEi-ZXPb89G8v4e8NYltvzcUDg";
+            <p class="eyebrow">A place for unfiltered thoughts</p>
 
-  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-  const TABLE = "posts";
+            <h1>
+                Say what you
+                <span>can't say out loud.</span>
+            </h1>
 
-  function escapeHTML(str) {
-    const div = document.createElement("div");
-    div.textContent = str;
-    return div.innerHTML;
-  }
+            <p class="hero-description">
+                Share a thought, idea or confession anonymously.
+                No profile. No pressure.
+            </p>
 
-  function showToast(msg) {
-    const toast = document.getElementById("toast");
-    toast.textContent = msg;
-    toast.classList.add("show");
-    setTimeout(() => toast.classList.remove("show"), 2200);
-  }
+            <button id="heroWriteBtn" class="primary-button">
+                Share anonymously
+            </button>
 
-  function renderPosts(posts) {
-    const feed = document.getElementById("feed");
-    if (!posts || posts.length === 0) {
-      feed.innerHTML = `<p class="hint" style="text-align:center;">No posts yet. Be the first backchod 👀</p>`;
-      return;
-    }
-    feed.innerHTML = "";
-    posts.forEach((post, i) => {
-      const el = document.createElement("div");
-      el.className = "post";
-      el.innerHTML = `
-        ${i === 0 ? '<span class="post-tag">NEW</span>' : ""}
-        <div class="post-top">
-          <span class="post-name">${escapeHTML(post.name)}</span>
-          <span class="post-user">${escapeHTML(post.username)}</span>
-        </div>
-        <p class="post-idea">${escapeHTML(post.idea)}</p>
-      `;
-      feed.appendChild(el);
-    });
-  }
+        </section>
 
-  async function loadPosts() {
-    const feed = document.getElementById("feed");
-    feed.innerHTML = `<p class="hint" style="text-align:center;">Loading the chaos...</p>`;
-    const { data, error } = await supabase
-      .from(TABLE)
-      .select("*")
-      .order("created_at", { ascending: false })
-      .limit(100);
 
-    if (error) {
-      feed.innerHTML = `<p class="hint" style="text-align:center;">Couldn't load posts. Check your Supabase URL/key are set correctly.</p>`;
-      console.error(error);
-      return;
-    }
-    renderPosts(data);
-  }
+        <!-- CREATE POST -->
 
-  document.getElementById("postForm").addEventListener("submit", async function (e) {
-    e.preventDefault();
-    const username = document.getElementById("username").value.trim();
-    const name = document.getElementById("name").value.trim();
-    const idea = document.getElementById("idea").value.trim();
-    if (!username || !name || !idea) return;
+        <section id="createSection" class="create-section hidden">
 
-    const btn = document.getElementById("submitBtn");
-    btn.disabled = true;
-    btn.textContent = "Posting...";
+            <div class="create-card">
 
-    const { error } = await supabase.from(TABLE).insert([{ username, name, idea }]);
+                <div class="card-header">
+                    <h2>What's on your mind?</h2>
 
-    btn.disabled = false;
-    btn.textContent = "Post It 🚀";
+                    <button id="closeBtn" class="close-button">
+                        ×
+                    </button>
+                </div>
 
-    if (error) {
-      console.error(error);
-      showToast("Oops, couldn't post. Try again.");
-      return;
-    }
+                <textarea
+                    id="postContent"
+                    maxlength="1000"
+                    placeholder="Write anything..."></textarea>
 
-    this.reset();
-    showToast("Posted! Sab ko pata chal gaya 👀");
-    document.getElementById("feed").scrollTop = 0;
-    loadPosts();
-  });
+                <div class="form-bottom">
 
-  // live updates: when anyone else posts, the feed refreshes for everyone watching
-  supabase
-    .channel("public:posts")
-    .on("postgres_changes", { event: "INSERT", schema: "public", table: TABLE }, () => {
-      loadPosts();
-    })
-    .subscribe();
+                    <div class="categories">
 
-  loadPosts();
-</script>
+                        <button
+                            class="category active"
+                            data-category="thought">
+                            Thought
+                        </button>
 
-<!--
-  SETUP — Supabase (free, no credit card required)
-  1. Go to supabase.com → sign up → "New project" (pick the free tier).
-  2. Open the SQL editor and run:
+                        <button
+                            class="category"
+                            data-category="idea">
+                            Idea
+                        </button>
 
-     create table posts (
-       id bigint generated always as identity primary key,
-       username text not null,
-       name text not null,
-       idea text not null,
-       created_at timestamptz default now()
-     );
+                        <button
+                            class="category"
+                            data-category="confession">
+                            Confession
+                        </button>
 
-     alter table posts enable row level security;
+                    </div>
 
-     create policy "public can read" on posts
-       for select using (true);
+                    <span id="characterCount">
+                        0 / 1000
+                    </span>
 
-     create policy "public can insert" on posts
-       for insert with check (true);
+                </div>
 
-  3. Go to Project Settings → API. Copy the "Project URL" and the
-     "anon public" key into SUPABASE_URL / SUPABASE_ANON_KEY above.
-  4. Deploy to Vercel as normal — the feed is now shared and public
-     for every visitor, live-updating when someone new posts.
--->
+                <button id="submitBtn" class="primary-button full">
+                    Post anonymously
+                </button>
+
+                <p id="formMessage"></p>
+
+            </div>
+
+        </section>
+
+
+        <!-- FEED -->
+
+        <section class="feed-section">
+
+            <div class="feed-header">
+
+                <div>
+                    <p class="eyebrow">Community</p>
+                    <h2>Recent thoughts</h2>
+                </div>
+
+                <div class="filters">
+
+                    <button
+                        class="filter active"
+                        data-filter="all">
+                        All
+                    </button>
+
+                    <button
+                        class="filter"
+                        data-filter="thought">
+                        Thoughts
+                    </button>
+
+                    <button
+                        class="filter"
+                        data-filter="idea">
+                        Ideas
+                    </button>
+
+                    <button
+                        class="filter"
+                        data-filter="confession">
+                        Confessions
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <div id="postsContainer" class="posts-container">
+
+                <div class="loading">
+                    Loading thoughts...
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <footer>
+        <p>ThoughtSpace — say it, let it out.</p>
+    </footer>
+
+
+    <script src="app.js"></script>
+
 </body>
 </html>
