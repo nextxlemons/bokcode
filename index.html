@@ -1,26 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
   <title>Backchodi Wall — Bol De Bhai</title>
 
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Poppins:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
 
-  <link
-    href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Poppins:ital,wght@0,400;0,500;0,600;1,400&display=swap"
-    rel="stylesheet"
-  >
-
-  <!-- Supabase - NO NODE.JS / NPM REQUIRED -->
+  <!-- Supabase JS client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
-
     :root {
       --pink: #ff2e93;
       --purple: #7b2ff7;
@@ -30,12 +23,9 @@
       --cream: #fff9f0;
     }
 
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
-    html,
-    body {
+    html, body {
       margin: 0;
       padding: 0;
       height: 100%;
@@ -47,35 +37,12 @@
       min-height: 100vh;
       overflow-x: hidden;
       position: relative;
-
       background:
-        radial-gradient(
-          circle at 15% 20%,
-          rgba(255, 46, 147, .55),
-          transparent 40%
-        ),
-        radial-gradient(
-          circle at 85% 15%,
-          rgba(123, 47, 247, .6),
-          transparent 45%
-        ),
-        radial-gradient(
-          circle at 50% 90%,
-          rgba(0, 245, 212, .35),
-          transparent 50%
-        ),
-        radial-gradient(
-          circle at 90% 80%,
-          rgba(255, 210, 63, .35),
-          transparent 40%
-        ),
-        linear-gradient(
-          160deg,
-          #1a0b2e 0%,
-          #2b0f4a 45%,
-          #170821 100%
-        );
-
+        radial-gradient(circle at 15% 20%, rgba(255, 46, 147, .55), transparent 40%),
+        radial-gradient(circle at 85% 15%, rgba(123, 47, 247, .6), transparent 45%),
+        radial-gradient(circle at 50% 90%, rgba(0, 245, 212, .35), transparent 50%),
+        radial-gradient(circle at 90% 80%, rgba(255, 210, 63, .35), transparent 40%),
+        linear-gradient(160deg, #1a0b2e 0%, #2b0f4a 45%, #170821 100%);
       background-attachment: fixed;
     }
 
@@ -83,19 +50,9 @@
       content: "";
       position: fixed;
       inset: 0;
-
       background:
-        repeating-conic-gradient(
-          from 250deg at 20% -10%,
-          rgba(255,255,255,.05) 0deg 4deg,
-          transparent 4deg 14deg
-        ),
-        repeating-conic-gradient(
-          from 290deg at 80% -10%,
-          rgba(255,255,255,.04) 0deg 4deg,
-          transparent 4deg 14deg
-        );
-
+        repeating-conic-gradient(from 250deg at 20% -10%, rgba(255,255,255,.05) 0deg 4deg, transparent 4deg 14deg),
+        repeating-conic-gradient(from 290deg at 80% -10%, rgba(255,255,255,.04) 0deg 4deg, transparent 4deg 14deg);
       pointer-events: none;
       z-index: 0;
     }
@@ -104,17 +61,9 @@
       content: "";
       position: fixed;
       inset: 0;
-
-      background-image:
-        radial-gradient(
-          circle,
-          rgba(255,255,255,.5) 1px,
-          transparent 1px
-        );
-
+      background-image: radial-gradient(circle, rgba(255,255,255,.5) 1px, transparent 1px);
       background-size: 3px 3px;
       opacity: .05;
-
       pointer-events: none;
       z-index: 0;
     }
@@ -125,54 +74,22 @@
       filter: blur(70px);
       opacity: .5;
       z-index: 0;
-
-      animation:
-        drift 14s ease-in-out infinite alternate;
+      animation: drift 14s ease-in-out infinite alternate;
     }
 
-    .blob1 {
-      width: 280px;
-      height: 280px;
-      background: var(--pink);
-      top: 8%;
-      left: -60px;
-    }
-
-    .blob2 {
-      width: 340px;
-      height: 340px;
-      background: var(--purple);
-      bottom: 5%;
-      right: -80px;
-      animation-delay: 2s;
-    }
-
-    .blob3 {
-      width: 200px;
-      height: 200px;
-      background: var(--mint);
-      top: 45%;
-      right: 20%;
-      animation-delay: 4s;
-    }
+    .blob1 { width: 280px; height: 280px; background: var(--pink); top: 8%; left: -60px; }
+    .blob2 { width: 340px; height: 340px; background: var(--purple); bottom: 5%; right: -80px; animation-delay: 2s; }
+    .blob3 { width: 200px; height: 200px; background: var(--mint); top: 45%; right: 20%; animation-delay: 4s; }
 
     @keyframes drift {
-
-      from {
-        transform: translateY(0) translateX(0);
-      }
-
-      to {
-        transform: translateY(-25px) translateX(20px);
-      }
-
+      from { transform: translateY(0) translateX(0); }
+      to   { transform: translateY(-25px) translateX(20px); }
     }
+
     header {
       position: relative;
       z-index: 2;
-
       text-align: center;
-
       padding: 46px 20px 28px;
     }
 
@@ -186,43 +103,21 @@
     h1 {
       font-family: 'Fredoka', sans-serif;
       font-weight: 700;
-
-      font-size: clamp(
-        2.3rem,
-        6vw,
-        4rem
-      );
-
+      font-size: clamp(2.3rem, 6vw, 4rem);
       margin: 0;
-
       letter-spacing: .5px;
-
-      background:
-        linear-gradient(
-          90deg,
-          var(--yellow),
-          var(--pink) 45%,
-          var(--mint)
-        );
-
+      background: linear-gradient(90deg, var(--yellow), var(--pink) 45%, var(--mint));
       -webkit-background-clip: text;
       background-clip: text;
-
       color: transparent;
-
-      text-shadow:
-        0 0 40px rgba(255,46,147,.25);
+      text-shadow: 0 0 40px rgba(255,46,147,.25);
     }
 
     header p {
       margin: 10px auto 0;
-
       max-width: 480px;
-
       font-size: 1rem;
-
       color: #e8d9ff;
-
       line-height: 1.55;
     }
 
@@ -234,144 +129,73 @@
     main {
       position: relative;
       z-index: 2;
-
       max-width: 1180px;
-
       margin: 0 auto;
-
       padding: 10px 24px 70px;
-
       display: grid;
-
-      grid-template-columns:
-        1.15fr
-        0.85fr;
-
+      grid-template-columns: 1.15fr 0.85fr;
       gap: 28px;
-
       align-items: start;
     }
 
-
     @media (max-width: 840px) {
-
-      main {
-        grid-template-columns: 1fr;
-      }
-
+      main { grid-template-columns: 1fr; }
     }
 
     .panel {
-      background:
-        rgba(255,255,255,.07);
-
-      border:
-        1px solid rgba(255,255,255,.16);
-
+      background: rgba(255,255,255,.07);
+      border: 1px solid rgba(255,255,255,.16);
       border-radius: 22px;
-
       backdrop-filter: blur(18px);
       -webkit-backdrop-filter: blur(18px);
-
-      box-shadow:
-        0 20px 50px rgba(0,0,0,.35);
-
+      box-shadow: 0 20px 50px rgba(0,0,0,.35);
       padding: 24px;
     }
 
-
     .panel-title {
       font-family: 'Fredoka', sans-serif;
-
       font-size: 1.3rem;
-
       font-weight: 600;
-
       margin: 0 0 4px;
-
       display: flex;
-
       align-items: center;
-
       gap: 8px;
     }
 
-
     .panel-sub {
       margin: 0 0 18px;
-
       font-size: .85rem;
-
       color: #cbb8ec;
     }
 
-
     #feed {
       display: flex;
-
       flex-direction: column;
-
       gap: 14px;
-
       max-height: 620px;
-
       overflow-y: auto;
-
       padding-right: 6px;
     }
 
-    #feed::-webkit-scrollbar {
-      width: 6px;
-    }
-
-
+    #feed::-webkit-scrollbar { width: 6px; }
     #feed::-webkit-scrollbar-thumb {
-      background:
-        rgba(255,255,255,.25);
-
+      background: rgba(255,255,255,.25);
       border-radius: 10px;
     }
 
     .post {
-      background:
-        linear-gradient(
-          135deg,
-          rgba(255,255,255,.09),
-          rgba(255,255,255,.03)
-        );
-
-      border:
-        1px solid rgba(255,255,255,.14);
-
+      background: linear-gradient(135deg, rgba(255,255,255,.09), rgba(255,255,255,.03));
+      border: 1px solid rgba(255,255,255,.14);
       border-radius: 16px;
-
       padding: 16px 18px;
-
       position: relative;
-
-      animation:
-        pop-in .35s ease;
+      animation: pop-in .35s ease;
     }
-
 
     @keyframes pop-in {
-
-      from {
-        opacity: 0;
-        transform:
-          translateY(10px)
-          scale(.97);
-      }
-
-      to {
-        opacity: 1;
-        transform:
-          translateY(0)
-          scale(1);
-      }
-
+      from { opacity: 0; transform: translateY(10px) scale(.97); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
     }
-
 
     .post-top {
       display: flex;
@@ -381,19 +205,8 @@
       margin-bottom: 6px;
     }
 
-
-    .post-name {
-      font-weight: 600;
-      font-size: .95rem;
-      color: var(--yellow);
-    }
-
-
-    .post-user {
-      font-size: .78rem;
-      color: #b9a4dd;
-    }
-
+    .post-name { font-weight: 600; font-size: .95rem; color: var(--yellow); }
+    .post-user { font-size: .78rem; color: #b9a4dd; }
 
     .post-idea {
       font-size: .95rem;
@@ -403,10 +216,8 @@
       word-wrap: break-word;
     }
 
-
     .post-tag {
       position: absolute;
-
       top: -9px;
       right: 14px;
       font-size: .65rem;
@@ -415,13 +226,10 @@
       padding: 2px 9px;
       border-radius: 20px;
       font-weight: 600;
-      box-shadow:
-        0 3px 10px rgba(255,46,147,.4);
+      box-shadow: 0 3px 10px rgba(255,46,147,.4);
     }
 
-    .field {
-      margin-bottom: 16px;
-    }
+    .field { margin-bottom: 16px; }
 
     .field label {
       display: block;
@@ -431,59 +239,35 @@
       font-weight: 500;
     }
 
-
     .field input,
     .field textarea {
       width: 100%;
-
-      background:
-        rgba(0,0,0,.25);
-
-      border:
-        1.5px solid rgba(255,255,255,.18);
-
+      background: rgba(0,0,0,.25);
+      border: 1.5px solid rgba(255,255,255,.18);
       border-radius: 12px;
-
       padding: 11px 13px;
-
       font-family: 'Poppins', sans-serif;
       font-size: .92rem;
       color: var(--cream);
       outline: none;
-
-      transition:
-        border-color .2s,
-        box-shadow .2s;
-
+      transition: border-color .2s, box-shadow .2s;
       resize: vertical;
     }
 
-
-    .field textarea {
-      min-height: 110px;
-    }
-
+    .field textarea { min-height: 110px; }
 
     .field input::placeholder,
-    .field textarea::placeholder {
-      color: #9884bd;
-    }
-
+    .field textarea::placeholder { color: #9884bd; }
 
     .field input:focus,
     .field textarea:focus {
       border-color: var(--pink);
-
-      box-shadow:
-        0 0 0 3px
-        rgba(255,46,147,.22);
+      box-shadow: 0 0 0 3px rgba(255,46,147,.22);
     }
 
     #submitBtn {
       width: 100%;
-
       border: none;
-
       border-radius: 14px;
       padding: 14px;
       font-family: 'Fredoka', sans-serif;
@@ -491,44 +275,19 @@
       font-weight: 600;
       letter-spacing: .3px;
       color: #1a0b2e;
-
-      background:
-        linear-gradient(
-          90deg,
-          var(--yellow),
-          var(--pink)
-        );
-
+      background: linear-gradient(90deg, var(--yellow), var(--pink));
       cursor: pointer;
-
-      transition:
-        transform .15s ease,
-        box-shadow .15s ease;
-
-      box-shadow:
-        0 10px 25px
-        rgba(255,46,147,.35);
+      transition: transform .15s ease, box-shadow .15s ease;
+      box-shadow: 0 10px 25px rgba(255,46,147,.35);
     }
 
-
-    #submitBtn:hover {
-      transform: translateY(-2px);
-    }
-
-
-    #submitBtn:active {
-      transform:
-        translateY(0)
-        scale(.98);
-    }
-
-
+    #submitBtn:hover { transform: translateY(-2px); }
+    #submitBtn:active { transform: translateY(0) scale(.98); }
     #submitBtn:disabled {
       opacity: .6;
       cursor: not-allowed;
       transform: none;
     }
-
 
     .hint {
       font-size: .72rem;
@@ -540,25 +299,15 @@
 
     .toast {
       position: fixed;
-
       bottom: 24px;
-
       left: 50%;
-
-      transform:
-        translateX(-50%)
-        translateY(20px);
-
+      transform: translateX(-50%) translateY(20px);
       background: var(--mint);
-
       color: #0e1a17;
-
       padding: 12px 22px;
-
       border-radius: 30px;
       font-weight: 600;
       font-size: .9rem;
-
       box-shadow: 0 10px 30px rgba(0,0,0,.4);
       opacity: 0;
       pointer-events: none;
@@ -566,609 +315,216 @@
       z-index: 10;
     }
 
-
     .toast.show {
       opacity: 1;
-
-      transform:
-        translateX(-50%)
-        translateY(0);
+      transform: translateX(-50%) translateY(0);
     }
 
     footer {
       position: relative;
-
       z-index: 2;
       text-align: center;
       padding: 20px;
       font-size: .75rem;
       color: #9884bd;
     }
-
   </style>
-
 </head>
 
-
 <body>
-
   <div class="glow-blob blob1"></div>
-
   <div class="glow-blob blob2"></div>
-
   <div class="glow-blob blob3"></div>
 
   <header>
-
-    <div class="mic-emoji">
-      🎤
-    </div>
-
-    <h1>
-      Backchodi Wall
-    </h1>
-
+    <div class="mic-emoji">🎤</div>
+    <h1>Backchodi Wall</h1>
     <p>
       Ideas, confessions, 3am thoughts, that one weird story —
-      <span>bol de bhai</span>,
-      nobody's judging (okay, maybe a little).
+      <span>bol de bhai</span>, nobody's judging (okay, maybe a little).
     </p>
-
   </header>
 
   <main>
-
-    <section
-      class="panel"
-      aria-label="Recent posts"
-    >
-
-      <h2 class="panel-title">
-        📢 Fresh Gossip
-      </h2>
-
-      <p class="panel-sub">
-        What everyone's confessing right now
-      </p>
+    <section class="panel" aria-label="Recent posts">
+      <h2 class="panel-title">📢 Fresh Gossip</h2>
+      <p class="panel-sub">What everyone's confessing right now</p>
 
       <div id="feed">
-
-        <p
-          class="hint"
-          style="text-align:center;"
-        >
-          Loading the chaos...
-        </p>
-
+        <p class="hint" style="text-align:center;">Loading the chaos...</p>
       </div>
-
     </section>
 
-    <section
-      class="panel"
-      aria-label="Submit a post"
-    >
-
-      <h2 class="panel-title">
-        ✍️ Your Turn
-      </h2>
-
-      <p class="panel-sub">
-        Spill it. Anonymous-ish.
-      </p>
+    <section class="panel" aria-label="Submit a post">
+      <h2 class="panel-title">✍️ Your Turn</h2>
+      <p class="panel-sub">Spill it. Anonymous-ish.</p>
 
       <form id="postForm">
-
-
-        <!-- USERNAME -->
-
         <div class="field">
-
-          <label for="username">
-            Username
-          </label>
-
-          <input
-            type="text"
-            id="username"
-            placeholder="e.g. chai_pe_charcha"
-            required
-            maxlength="30"
-          >
-
+          <label for="username">Username</label>
+          <input type="text" id="username" placeholder="e.g. chai_pe_charcha" required maxlength="30">
         </div>
 
-
-        <!-- NAME -->
-
         <div class="field">
-
-          <label for="name">
-            Name
-          </label>
-
-          <input
-            type="text"
-            id="name"
-            placeholder="e.g. Rohit"
-            required
-            maxlength="30"
-          >
-
+          <label for="name">Name</label>
+          <input type="text" id="name" placeholder="e.g. Rohit" required maxlength="30">
         </div>
 
-
-        <!-- IDEA -->
-
         <div class="field">
-
-          <label for="idea">
-            Your idea / confession / story
-          </label>
-
-          <textarea
-            id="idea"
-            placeholder="I once told my boss I had a 'family emergency' to watch a cricket match..."
-            required
-            maxlength="500"
-          ></textarea>
-
+          <label for="idea">Your idea / confession / story</label>
+          <textarea id="idea" placeholder="I once told my boss I had a 'family emergency' to watch a cricket match..." required maxlength="500"></textarea>
         </div>
 
+        <button type="submit" id="submitBtn">Post It 🚀</button>
 
-        <button
-          type="submit"
-          id="submitBtn"
-        >
-          Post It 🚀
-        </button>
-
-
-        <p class="hint">
-          Public wall — everyone who visits sees everyone's posts.
-        </p>
-
+        <p class="hint">Public wall — everyone who visits sees everyone's posts.</p>
       </form>
-
     </section>
-
   </main>
 
   <footer>
-    made with chai ☕ and questionable decisions —
-    Backchodi Wall © 2026
+    made with chai ☕ and questionable decisions — Backchodi Wall © 2026
   </footer>
 
-
-  <!-- TOAST -->
-
-  <div
-    class="toast"
-    id="toast"
-  >
-    Posted! Sab ko pata chal gaya 👀
-  </div>
+  <div class="toast" id="toast">Posted! Sab ko pata chal gaya 👀</div>
 
   <script>
+    "use strict";
+
 
     const SUPABASE_URL = "https://tcndrqpzbbliqaggcugp.supabase.co";
-    const SUPABASE_ANON_KEY = "sb_publishable_KKSnuY0Eeui0OCyR-FW1rw_Dv8Rh9DY";
-
-
-    // Create Supabase client
-
-    const supabase =
-      window.supabase.createClient(
-        SUPABASE_URL,
-        SUPABASE_ANON_KEY
-      );
-
-
-    // Database table
+    const SUPABASE_KEY = "sb_publishable_KKSnuY0Eeui0OCyR-FW1rw_Dv8Rh9DY";
 
     const TABLE = "posts";
 
+    const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    const feedEl = document.getElementById("feed");
+    const formEl = document.getElementById("postForm");
+    const submitBtn = document.getElementById("submitBtn");
+    const toastEl = document.getElementById("toast");
 
     // =====================================================
-    // ESCAPE HTML
+    // UTILITIES
     // =====================================================
-
     function escapeHTML(str) {
-
-      const div =
-        document.createElement("div");
-
+      const div = document.createElement("div");
       div.textContent = str;
-
       return div.innerHTML;
-
     }
-
-
-    // =====================================================
-    // TOAST
-    // =====================================================
 
     function showToast(message) {
-
-      const toast =
-        document.getElementById("toast");
-
-      toast.textContent = message;
-
-      toast.classList.add("show");
-
-
-      setTimeout(() => {
-
-        toast.classList.remove("show");
-
-      }, 2200);
-
+      toastEl.textContent = message;
+      toastEl.classList.add("show");
+      setTimeout(() => toastEl.classList.remove("show"), 2200);
     }
 
+    function setFeedMessage(message) {
+      feedEl.innerHTML = `<p class="hint" style="text-align:center;">${message}</p>`;
+    }
 
     // =====================================================
-    // RENDER POSTS
+    // RENDER
     // =====================================================
-
     function renderPosts(posts) {
-
-      const feed =
-        document.getElementById("feed");
-
-
-      // No posts
-
       if (!posts || posts.length === 0) {
-
-        feed.innerHTML = `
-          <p
-            class="hint"
-            style="text-align:center;"
-          >
-            No posts yet.
-            Be the first backchod 👀
-          </p>
-        `;
-
+        setFeedMessage("No posts yet. Be the first backchod 👀");
         return;
-
       }
 
-
-      // Clear feed
-
-      feed.innerHTML = "";
-
-
-      // Render each post
+      feedEl.innerHTML = "";
 
       posts.forEach((post, index) => {
-
-        const element =
-          document.createElement("div");
-
-        element.className = "post";
-
-
-        element.innerHTML = `
-
-          ${
-            index === 0
-              ? '<span class="post-tag">NEW</span>'
-              : ''
-          }
-
+        const el = document.createElement("div");
+        el.className = "post";
+        el.innerHTML = `
+          ${index === 0 ? '<span class="post-tag">NEW</span>' : ""}
           <div class="post-top">
-
-            <span class="post-name">
-              ${escapeHTML(post.name)}
-            </span>
-
-            <span class="post-user">
-              ${escapeHTML(post.username)}
-            </span>
-
+            <span class="post-name">${escapeHTML(post.name)}</span>
+            <span class="post-user">${escapeHTML(post.username)}</span>
           </div>
-
-
-          <p class="post-idea">
-            ${escapeHTML(post.idea)}
-          </p>
-
+          <p class="post-idea">${escapeHTML(post.idea)}</p>
         `;
-
-
-        feed.appendChild(element);
-
+        feedEl.appendChild(el);
       });
-
     }
 
-
     // =====================================================
-    // LOAD POSTS
+    // DATA
     // =====================================================
-
     async function loadPosts() {
-
-      const feed =
-        document.getElementById("feed");
-
-
-      feed.innerHTML = `
-        <p
-          class="hint"
-          style="text-align:center;"
-        >
-          Loading the chaos...
-        </p>
-      `;
-
+      setFeedMessage("Loading the chaos...");
 
       try {
-
-        const {
-          data,
-          error
-        } = await supabase
-
+        const { data, error } = await db
           .from(TABLE)
-
           .select("*")
-
-          .order(
-            "created_at",
-            {
-              ascending: false
-            }
-          )
-
+          .order("created_at", { ascending: false })
           .limit(100);
 
-
-        // Supabase error
-
         if (error) {
-
-          console.error(
-            "Supabase load error:",
-            error
-          );
-
-
-          feed.innerHTML = `
-            <p
-              class="hint"
-              style="text-align:center;"
-            >
-              Couldn't load posts.
-              Check your Supabase settings.
-            </p>
-          `;
-
+          console.error("Supabase load error:", error);
+          setFeedMessage("Couldn't load posts. Check your Supabase settings.");
           return;
-
         }
-
 
         renderPosts(data);
-
+      } catch (err) {
+        console.error(err);
+        setFeedMessage("Something went wrong.");
       }
-
-      catch (error) {
-
-        console.error(error);
-
-        feed.innerHTML = `
-          <p
-            class="hint"
-            style="text-align:center;"
-          >
-            Something went wrong.
-          </p>
-        `;
-
-      }
-
     }
 
+    async function submitPost(username, name, idea) {
+      const { error } = await db.from(TABLE).insert([{ username, name, idea }]);
+
+      if (error) {
+        console.error("Supabase insert error:", error);
+        throw error;
+      }
+    }
 
     // =====================================================
-    // SUBMIT POST
+    // EVENTS
     // =====================================================
-
-    document
-      .getElementById("postForm")
-      .addEventListener(
-        "submit",
-        async function (event) {
-
-
-          // Stop normal form submit
-
-          event.preventDefault();
-
-
-          // Get values
-
-          const username =
-            document
-              .getElementById("username")
-              .value
-              .trim();
-
-
-          const name =
-            document
-              .getElementById("name")
-              .value
-              .trim();
-
-
-          const idea =
-            document
-              .getElementById("idea")
-              .value
-              .trim();
-
-
-          // Basic validation
-
-          if (
-            !username ||
-            !name ||
-            !idea
-          ) {
-
-            return;
-
-          }
-
-
-          // Button
-
-          const button =
-            document.getElementById(
-              "submitBtn"
-            );
-
-
-          button.disabled = true;
-
-          button.textContent =
-            "Posting...";
-
-
-          try {
-
-
-            // Insert into Supabase
-
-            const {
-              error
-            } = await supabase
-
-              .from(TABLE)
-
-              .insert([
-                {
-                  username: username,
-                  name: name,
-                  idea: idea
-                }
-              ]);
-
-
-            // Error
-
-            if (error) {
-
-              console.error(
-                "Supabase insert error:",
-                error
-              );
-
-
-              showToast(
-                "Oops, couldn't post. Try again."
-              );
-
-              return;
-
-            }
-
-
-            // Reset form
-
-            this.reset();
-
-
-            // Success message
-
-            showToast(
-              "Posted! Sab ko pata chal gaya 👀"
-            );
-
-
-            // Refresh feed
-
-            await loadPosts();
-
-
-            // Scroll feed to top
-
-            document
-              .getElementById("feed")
-              .scrollTop = 0;
-
-          }
-
-          catch (error) {
-
-            console.error(error);
-
-            showToast(
-              "Something went wrong."
-            );
-
-          }
-
-          finally {
-
-            button.disabled = false;
-
-            button.textContent =
-              "Post It 🚀";
-
-          }
-
-        }
-      );
-
-
-    // =====================================================
-    // REAL-TIME UPDATES
-    // =====================================================
-    //
-    // When another visitor creates a post,
-    // everyone currently viewing the website
-    // gets the new post automatically.
-    //
-    // =====================================================
-
-    supabase
-
-      .channel("public:posts")
-
+    formEl.addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      const username = document.getElementById("username").value.trim();
+      const name = document.getElementById("name").value.trim();
+      const idea = document.getElementById("idea").value.trim();
+
+      if (!username || !name || !idea) return;
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Posting...";
+
+      try {
+        await submitPost(username, name, idea);
+        formEl.reset();
+        showToast("Posted! Sab ko pata chal gaya 👀");
+        await loadPosts();
+        feedEl.scrollTop = 0;
+      } catch (err) {
+        showToast("Oops, couldn't post. Try again.");
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Post It 🚀";
+      }
+    });
+
+    // Live updates: when anyone inserts a new post, refresh the feed
+    // for everyone currently viewing the page.
+    db.channel("public:posts")
       .on(
         "postgres_changes",
-        {
-          event: "INSERT",
-          schema: "public",
-          table: TABLE
-        },
-        function () {
-
-          loadPosts();
-
-        }
+        { event: "INSERT", schema: "public", table: TABLE },
+        () => loadPosts()
       )
-
       .subscribe();
 
-
-    // =====================================================
-    // INITIAL LOAD
-    // =====================================================
-
+    // Initial load
     loadPosts();
-
-
   </script>
-
-
 </body>
-
 </html>
