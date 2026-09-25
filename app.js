@@ -1,442 +1,137 @@
-// ==========================================
-// SUPABASE CONFIG
-// ==========================================
-
+"use strict";
 
 
 const SUPABASE_URL = "https://tcndrqpzbbliqaggcugp.supabase.co";
-
 const SUPABASE_KEY = "sb_publishable_KKSnuY0Eeui0OCyR-FW1rw_Dv8Rh9DY";
 
-const supabaseClient = supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_KEY
-);
+const TABLE = "posts";
 
 
+const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// ==========================================
-// VARIABLES
-// ==========================================
-
-let selectedCategory = "thought";
-let selectedFilter = "all";
-
-
-// ==========================================
-// DOM ELEMENTS
-// ==========================================
-
-const createSection = document.getElementById("createSection");
-const postContent = document.getElementById("postContent");
+const feedEl = document.getElementById("feed");
+const formEl = document.getElementById("postForm");
 const submitBtn = document.getElementById("submitBtn");
-const postsContainer = document.getElementById("postsContainer");
-const characterCount = document.getElementById("characterCount");
-const formMessage = document.getElementById("formMessage");
+const toastEl = document.getElementById("toast");
 
-
-// ==========================================
-// OPEN CREATE FORM
-// ==========================================
-
-document.getElementById("writeBtn").addEventListener("click", openForm);
-
-document.getElementById("heroWriteBtn").addEventListener("click", openForm);
-
-
-function openForm() {
-
-    createSection.classList.remove("hidden");
-
-    postContent.focus();
-
-    createSection.scrollIntoView({
-        behavior: "smooth"
-    });
+// =====================================================
+// UTILITIES
+// =====================================================
+function escapeHTML(str) {
+  const div = document.createElement("div");
+  div.textContent = str;
+  return div.innerHTML;
 }
 
-
-// ==========================================
-// CLOSE FORM
-// ==========================================
-
-document.getElementById("closeBtn").addEventListener("click", () => {
-
-    createSection.classList.add("hidden");
-
-});
-
-
-// ==========================================
-// CHARACTER COUNTER
-// ==========================================
-
-postContent.addEventListener("input", () => {
-
-    const length = postContent.value.length;
-
-    characterCount.textContent = `${length} / 1000`;
-
-});
-
-
-// ==========================================
-// CATEGORY SELECTION
-// ==========================================
-
-document.querySelectorAll(".category").forEach(button => {
-
-    button.addEventListener("click", () => {
-
-        document
-            .querySelectorAll(".category")
-            .forEach(btn => btn.classList.remove("active"));
-
-        button.classList.add("active");
-
-        selectedCategory = button.dataset.category;
-
-    });
-
-});
-
-
-// ==========================================
-// CREATE POST
-// ==========================================
-
-submitBtn.addEventListener("click", createPost);
-
-
-async function createPost() {
-
-    const content = postContent.value.trim();
-
-    if (!content) {
-
-        showMessage(
-            "Write something first.",
-            true
-        );
-
-        return;
-    }
-
-    if (content.length > 1000) {
-
-        showMessage(
-            "Your post is too long.",
-            true
-        );
-
-        return;
-    }
-
-
-    submitBtn.disabled = true;
-    submitBtn.textContent = "Posting...";
-
-
-    const { error } = await supabaseClient
-        .from("posts")
-        .insert({
-            content: content,
-            category: selectedCategory
-        });
-
-
-    if (error) {
-
-        console.error(error);
-
-        showMessage(
-            "Something went wrong. Try again.",
-            true
-        );
-
-        submitBtn.disabled = false;
-        submitBtn.textContent = "Post anonymously";
-
-        return;
-    }
-
-
-    // Reset form
-
-    postContent.value = "";
-
-    characterCount.textContent = "0 / 1000";
-
-    showMessage(
-        "Posted anonymously.",
-        false
-    );
-
-
-    submitBtn.disabled = false;
-    submitBtn.textContent = "Post anonymously";
-
-
-    // Reload feed
-
-    await loadPosts();
-
-
-    // Hide form after posting
-
-    setTimeout(() => {
-
-        createSection.classList.add("hidden");
-
-        formMessage.textContent = "";
-
-    }, 1000);
+function showToast(message) {
+  toastEl.textContent = message;
+  toastEl.classList.add("show");
+  setTimeout(() => toastEl.classList.remove("show"), 2200);
 }
 
+function setFeedMessage(message) {
+  feedEl.innerHTML = `<p class="hint" style="text-align:center;">${message}</p>`;
+}
 
-// ==========================================
-// LOAD POSTS
-// ==========================================
+// =====================================================
+// RENDER
+// =====================================================
+function renderPosts(posts) {
+  if (!posts || posts.length === 0) {
+    setFeedMessage("No posts yet. Be the first backchod 👀");
+    return;
+  }
 
-async function loadPosts() {
+  feedEl.innerHTML = "";
 
-    postsContainer.innerHTML = `
-        <div class="loading">
-            Loading thoughts...
-        </div>
+  posts.forEach((post, index) => {
+    const el = document.createElement("div");
+    el.className = "post";
+    el.innerHTML = `
+      ${index === 0 ? '<span class="post-tag">NEW</span>' : ""}
+      <div class="post-top">
+        <span class="post-name">${escapeHTML(post.name)}</span>
+        <span class="post-user">${escapeHTML(post.username)}</span>
+      </div>
+      <p class="post-idea">${escapeHTML(post.idea)}</p>
     `;
+    feedEl.appendChild(el);
+  });
+}
 
+// =====================================================
+// DATA
+// =====================================================
+async function loadPosts() {
+  setFeedMessage("Loading the chaos...");
 
-    let query = supabaseClient
-        .from("posts")
-        .select("*")
-        .order("created_at", {
-            ascending: false
-        });
-
-
-    // Apply filter
-
-    if (selectedFilter !== "all") {
-
-        query = query.eq(
-            "category",
-            selectedFilter
-        );
-
-    }
-
-
-    const { data, error } = await query;
-
+  try {
+    const { data, error } = await db
+      .from(TABLE)
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(100);
 
     if (error) {
-
-        console.error(error);
-
-        postsContainer.innerHTML = `
-            <div class="empty">
-                Could not load posts.
-            </div>
-        `;
-
-        return;
+      console.error("Supabase load error:", error);
+      setFeedMessage("Couldn't load posts. Check your Supabase settings.");
+      return;
     }
-
-
-    if (!data || data.length === 0) {
-
-        postsContainer.innerHTML = `
-            <div class="empty">
-                No posts yet.
-            </div>
-        `;
-
-        return;
-    }
-
 
     renderPosts(data);
+  } catch (err) {
+    console.error(err);
+    setFeedMessage("Something went wrong.");
+  }
 }
 
+async function submitPost(username, name, idea) {
+  const { error } = await db.from(TABLE).insert([{ username, name, idea }]);
 
-// ==========================================
-// RENDER POSTS
-// ==========================================
-
-function renderPosts(posts) {
-
-    postsContainer.innerHTML = "";
-
-
-    posts.forEach(post => {
-
-        const card = document.createElement("article");
-
-        card.className = "post-card";
-
-
-        const date = new Date(
-            post.created_at
-        ).toLocaleString();
-
-
-        card.innerHTML = `
-            <div class="post-top">
-
-                <span class="post-category">
-                    ${escapeHTML(post.category)}
-                </span>
-
-                <span class="post-date">
-                    ${date}
-                </span>
-
-            </div>
-
-
-            <div class="post-content">
-                ${escapeHTML(post.content)}
-            </div>
-
-
-            <div class="post-bottom">
-
-                <button
-                    class="like-button"
-                    data-id="${post.id}">
-                    ♡ ${post.likes_count}
-                </button>
-
-            </div>
-        `;
-
-
-        postsContainer.appendChild(card);
-
-    });
-
-
-    // Like buttons
-
-    document
-        .querySelectorAll(".like-button")
-        .forEach(button => {
-
-            button.addEventListener(
-                "click",
-                () => likePost(button.dataset.id)
-            );
-
-        });
+  if (error) {
+    console.error("Supabase insert error:", error);
+    throw error;
+  }
 }
 
+// =====================================================
+// EVENTS
+// =====================================================
+formEl.addEventListener("submit", async (event) => {
+  event.preventDefault();
 
-// ==========================================
-// LIKE POST
-// ==========================================
+  const username = document.getElementById("username").value.trim();
+  const name = document.getElementById("name").value.trim();
+  const idea = document.getElementById("idea").value.trim();
 
-async function likePost(postId) {
+  if (!username || !name || !idea) return;
 
-    const { data, error } = await supabaseClient
-        .from("posts")
-        .select("likes_count")
-        .eq("id", postId)
-        .single();
+  submitBtn.disabled = true;
+  submitBtn.textContent = "Posting...";
 
-
-    if (error) {
-
-        console.error(error);
-
-        return;
-    }
-
-
-    const newCount =
-        (data.likes_count || 0) + 1;
-
-
-    const { error: updateError } =
-        await supabaseClient
-            .from("posts")
-            .update({
-                likes_count: newCount
-            })
-            .eq("id", postId);
-
-
-    if (updateError) {
-
-        console.error(updateError);
-
-        return;
-    }
-
-
-    loadPosts();
-}
-
-
-// ==========================================
-// FILTERS
-// ==========================================
-
-document.querySelectorAll(".filter").forEach(button => {
-
-    button.addEventListener("click", () => {
-
-        document
-            .querySelectorAll(".filter")
-            .forEach(btn =>
-                btn.classList.remove("active")
-            );
-
-
-        button.classList.add("active");
-
-
-        selectedFilter =
-            button.dataset.filter;
-
-
-        loadPosts();
-
-    });
-
+  try {
+    await submitPost(username, name, idea);
+    formEl.reset();
+    showToast("Posted! Sab ko pata chal gaya 👀");
+    await loadPosts();
+    feedEl.scrollTop = 0;
+  } catch (err) {
+    showToast("Oops, couldn't post. Try again.");
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.textContent = "Post It 🚀";
+  }
 });
 
+// Live updates: when anyone inserts a new post, refresh the feed
+// for everyone currently viewing the page.
+db.channel("public:posts")
+  .on(
+    "postgres_changes",
+    { event: "INSERT", schema: "public", table: TABLE },
+    () => loadPosts()
+  )
+  .subscribe();
 
-// ==========================================
-// MESSAGE
-// ==========================================
-
-function showMessage(message, error) {
-
-    formMessage.textContent = message;
-
-    formMessage.style.color =
-        error ? "#d33" : "#198754";
-
-}
-
-
-// ==========================================
-// SECURITY
-// ==========================================
-
-function escapeHTML(value) {
-
-    const div = document.createElement("div");
-
-    div.textContent = value;
-
-    return div.innerHTML;
-}
-
-
-// ==========================================
-// INITIAL LOAD
-// ==========================================
-
+// Initial load
 loadPosts();
